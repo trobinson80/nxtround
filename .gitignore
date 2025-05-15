@@ -1,0 +1,21 @@
+# Python environment and secrets
+backend/venv/
+backend/__pycache__/
+backend/.env
+
+# Node and React build files
+frontend/node_modules/
+frontend/build/
+frontend/.env
+
+# macOS system files
+.DS_Store
+
+
+# IDE/editor settings (VS Code, etc.)
+.vscode/
+*.log
+*.pyc
+
+# OS generated files
+Thumbs.db
