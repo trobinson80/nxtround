@@ -1,5 +1,7 @@
 from openai import OpenAI
 from dotenv import load_dotenv
+import json
+import random
 
 # Load from .env file
 load_dotenv()
@@ -9,8 +11,10 @@ api_key = os.getenv("OPENAI_API_KEY")  # Ensure your .env has this key set
 client = OpenAI(api_key=api_key)  # Pass key directly to client
 
 def ask_initial_question():
-    return "Tell me about a time you had to deal with a difficult bug under pressure."
-
+    with open("behavioral_questions.json", "r") as f:
+        data = json.load(f)
+        questions = data.get("behavioral_questions", [])
+    return random.choice(questions)
 
 def evaluate_response(response):
     prompt = f"""
