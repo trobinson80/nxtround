@@ -1,18 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import FeedbackDisplay from './FeedbackDisplay'; // Make sure this path is correct
+import React, { useState } from 'react';
+import FeedbackDisplay from './FeedbackDisplay';
+import QuestionDisplay from './QuestionDisplay';
+import questionsData from '../data/behavioral_questions.json';
+
+const allQuestions = questionsData.behavioral_questions;
+const getRandomQuestion = () =>
+  allQuestions[Math.floor(Math.random() * allQuestions.length)];
 
 function InterviewForm() {
-  const [question, setQuestion] = useState('');
+  const [question, setQuestion] = useState(getRandomQuestion()); // SET RANDOM QUESTION INITIALLY
   const [response, setResponse] = useState('');
   const [feedback, setFeedback] = useState(null);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    axios.get('http://localhost:5000/question')
-      .then(res => setQuestion(res.data.question))
-      .catch(err => console.error("Failed to fetch question", err));
-  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,11 +19,13 @@ function InterviewForm() {
     setFeedback(null);
 
     try {
-      const res = await axios.post('http://localhost:5000/feedback', {
-        question,
-        response
+      const res = await fetch('http://localhost:5000/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question, response }),
       });
-      setFeedback(res.data); // Use full JSON object
+      const data = await res.json();
+      setFeedback(data);
     } catch (err) {
       setFeedback({ feedback: 'Error getting feedback.' });
     } finally {
@@ -36,10 +37,7 @@ function InterviewForm() {
     <div className="container">
       <h2>NXTRound Prep</h2>
 
-      <div className="box">
-        <strong>Question:</strong>
-        <p>{question}</p>
-      </div>
+      <QuestionDisplay question={question} onChange={setQuestion} />
 
       <form onSubmit={handleSubmit}>
         <div className="box">
@@ -53,7 +51,6 @@ function InterviewForm() {
           <button type="submit" disabled={loading}>
             {loading ? 'Evaluating...' : 'Submit'}
           </button>
-
           {loading && <div className="spinner"></div>}
         </div>
       </form>
