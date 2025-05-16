@@ -8,29 +8,30 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def evaluate_response(question, user_response):
     prompt = f"""
-You are simulating a behavioral interview for a software engineering role.
+You are simulating a senior-level behavioral interview for a software engineering candidate.
 
-Question: {question}
+Here is the question:
+"{question}"
 
-Candidate's Answer:
+Here is the candidate's answer:
 \"\"\"{user_response}\"\"\"
 
-Evaluate the response using the STAR method:
-- Situation
-- Task
-- Action
-- Result
+Your task is to evaluate the answer strictly using the STAR method:
+- **Situation**: Did they provide relevant background and context?
+- **Task**: Did they clearly state their responsibility or challenge?
+- **Action**: Did they explain specific steps they took?
+- **Result**: Did they describe a measurable or observable outcome?
 
-For each part, return:
-- response (string)
-- clarity_score (integer 1–10)
-- completeness_score (integer 1–10)
+You MUST also assess whether the candidate actually answered the question being asked. Penalize clarity or completeness if they went off-topic, missed the point, or gave a generic answer.
 
-Also include:
-- overall_score (e.g., "7 out of 10")
-- feedback (summary of strengths and areas for improvement)
+### Instructions:
+- Do NOT assume intent. Only evaluate what is explicitly stated.
+- Give **lower completeness scores** if any part of STAR is implied but not directly described.
+- Give **lower clarity scores** if a section is confusing, vague, or wordy.
+- Do NOT include compliments unless relevant to performance. Stay professional and precise.
+- You MUST respond strictly in the JSON format below.
 
-Respond in ONLY the following JSON format:
+Expected JSON format:
 {{
   "situation": {{
     "response": "...",
@@ -52,8 +53,8 @@ Respond in ONLY the following JSON format:
     "clarity_score": ...,
     "completeness_score": ...
   }},
-  "overall_score": "...",
-  "feedback": "..."
+  "overall_score": "...",  // Briefly explain score calculation
+  "feedback": "Summarize areas of strength and improvement. Be blunt but fair. Highlight whether they answered the actual question or not."
 }}
 """
 
@@ -67,7 +68,6 @@ Respond in ONLY the following JSON format:
 
     content = res.choices[0].message.content.strip()
 
-    # Try parsing the content to make sure it’s valid JSON
     try:
         parsed_json = json.loads(content)
         return parsed_json
