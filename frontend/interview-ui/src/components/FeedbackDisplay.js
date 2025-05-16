@@ -14,16 +14,25 @@ function getScoreColorClass(score) {
       result: "Result"
     };
   
+    const sectionKeys = Object.keys(sectionTitles);
+    const clarityScores = sectionKeys.map(k => feedback[k]?.clarity_score || 0);
+    const completenessScores = sectionKeys.map(k => feedback[k]?.completeness_score || 0);
+  
+    const avg = arr => arr.reduce((a, b) => a + b, 0) / arr.length;
+  
+    const avgClarity = Number(avg(clarityScores).toFixed(2));
+    const avgCompleteness = Number(avg(completenessScores).toFixed(2));
+  
     return (
       <div style={{ marginTop: 20 }}>
         <h3>Feedback</h3>
   
-        {Object.entries(sectionTitles).map(([key, label]) => {
+        {sectionKeys.map(key => {
           const section = feedback[key];
           if (!section) return null;
           return (
             <div key={key} className="box">
-              <h4>{label}</h4>
+              <h4>{sectionTitles[key]}</h4>
               <p>
                 <strong>Clarity:</strong>{' '}
                 <span className={getScoreColorClass(section.clarity_score)}>
@@ -43,7 +52,14 @@ function getScoreColorClass(score) {
   
         <div className="box">
           <h4>Overall Score</h4>
-          <p>{feedback.overall_score}</p>
+          <p>
+            <strong>Clarity:</strong>{' '}
+            <span className={getScoreColorClass(avgClarity)}>{avgClarity}/10</span>
+          </p>
+          <p>
+            <strong>Completeness:</strong>{' '}
+            <span className={getScoreColorClass(avgCompleteness)}>{avgCompleteness}/10</span>
+          </p>
         </div>
   
         <div className="box">
