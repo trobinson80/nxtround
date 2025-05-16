@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import FeedbackDisplay from './FeedbackDisplay'; // Make sure this path is correct
 
 function InterviewForm() {
   const [question, setQuestion] = useState('');
   const [response, setResponse] = useState('');
-  const [feedback, setFeedback] = useState('');
+  const [feedback, setFeedback] = useState(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -16,16 +17,16 @@ function InterviewForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setFeedback('');
+    setFeedback(null);
 
     try {
       const res = await axios.post('http://localhost:5000/feedback', {
         question,
         response
       });
-      setFeedback(res.data.feedback);
+      setFeedback(res.data); // Use full JSON object
     } catch (err) {
-      setFeedback('Error getting feedback.');
+      setFeedback({ feedback: 'Error getting feedback.' });
     } finally {
       setLoading(false);
     }
@@ -33,7 +34,7 @@ function InterviewForm() {
 
   return (
     <div className="container">
-      <h2>🧠 Behavioral Interview Bot</h2>
+      <h2>NXTRound Prep</h2>
 
       <div className="box">
         <strong>Question:</strong>
@@ -59,8 +60,7 @@ function InterviewForm() {
 
       {feedback && (
         <div className="box">
-          <h3>Feedback</h3>
-          <pre style={{ whiteSpace: 'pre-wrap' }}>{feedback}</pre>
+          <FeedbackDisplay feedback={feedback} />
         </div>
       )}
     </div>
