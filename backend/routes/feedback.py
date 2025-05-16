@@ -14,7 +14,8 @@ def get_feedback():
             return jsonify({"error": "No response provided"}), 400
 
         feedback = evaluate_response(question, user_response)
-        return jsonify({"feedback": feedback})
+        print(feedback)
+        return jsonify(feedback)
 
     except Exception as e:
         return jsonify({"error": f"Failed to generate feedback: {str(e)}"}), 500
